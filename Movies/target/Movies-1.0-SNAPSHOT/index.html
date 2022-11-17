@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Movies</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet"> 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="C:\Workspace\progmod2\MovieRating\Movies\movies\style.css"/>
+        <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+        <script>
+
+            function getMovies() {
+                //clear the site
+                $("#movieContainer").html("");
+
+                $.get("http://127.0.0.1:8080/Movies-1.0-SNAPSHOT/resources/jakartaee9/getMovies", function (data) {
+                    if (data == null) {
+                        alert("An error occured!");
+                        return;
+                    }
+                    for (let i in data.movies) {
+                        $("#movieContainer").append(
+                                `<div class="movie bordershadow">
+                                    <h2> ${data.movies[i].Title} </h2>
+                                    <p>Primary genre: ${data.movies[i].PrimaryGenre} </p>
+                                    <p>Release date: ${data.movies[i].ReleaseDate} </p>
+                                    <p>Directed by: ${data.movies[i].Director} </p>
+                                    <span class="fa fa-star" data-movie="${i}" data-id="1" onclick="rateClicked(this)"></span>
+                                    <span class="fa fa-star" data-movie="${i}" data-id="2" onclick="rateClicked(this)"></span>
+                                    <span class="fa fa-star" data-movie="${i}" data-id="3" onclick="rateClicked(this)"></span>
+                                    <span class="fa fa-star" data-movie="${i}" data-id="4" onclick="rateClicked(this)"></span>
+                                    <span class="fa fa-star" data-movie="${i}" data-id="5" onclick="rateClicked(this)"></span>
+                                </div>`);
+                        for (let k = 1; k <= data.movies[i].Scores; k++) {
+                            $(`.fa[data-movie="${i}"][data-id="${k}"]`).addClass("checked");
+                        }
+                    }
+
+                });
+            }
+            function updateRating(index) {
+                $.get(`http://127.0.0.1:8080/Movies-1.0-SNAPSHOT/resources/jakartaee9/updateScore?index=${index}`, function (data) {
+                    if (data === null) {
+                        alert("An error occured!");
+                        return;
+                    }
+                    $(`.fa[data-movie="${index}"]`).removeClass("checked");
+                    for (let k = 1; k <= data; k++) {
+                        $(`.fa[data-movie="${index}"][data-id="${k}"]`).addClass("checked");
+                    }
+                });
+            }
+            function rateClicked(star) {
+                let score = star.dataset.id;
+                let index = star.dataset.movie;
+                let data = ("{\"index\":" + index + ", \"score\":" + score + "}");
+                $.ajax({
+                    type: "POST",
+                    url: "http://127.0.0.1:8080/Movies-1.0-SNAPSHOT/resources/jakartaee9/rateMovie",
+                    data: data,
+                    success: function (data) {
+                        updateRating(index);
+                        $(`#rateMessage${star.dataset.movie}`).html(data);
+                        $("#rateMessage").addClass("animation");
+                        $("#rateMessage").css("visibility", "visible");
+                        setTimeout(() => {
+                            $("#rateMessage").css("visibility", "hidden");
+                            $("#rateMessage").removeClass("animation");
+                        }, 2000)
+
+                        console.log(data);
+                    },
+                    dataType: "text",
+                    contentType: "application/json"
+                });
+            }
+        </script>
+        <style>
+            :root{
+                --dark-color: #0d0106;
+                --accent-color: #44344f;
+                --light-color: #fbfbff;
+            }
+            body{
+                margin: 0;
+                padding: 0;
+                padding-bottom: 20px;
+                font-family: 'DM Sans', sans-serif;
+                background-color: var(--light-color);
+                cursor:default;
+            }
+            #movieContainer{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .movie{
+                width: clamp(200px, 50%, 500px);
+                background-color: var(--light-color);
+                color: var(--dark-color);
+                margin: 20px 0px 0px 0px;
+                padding: 10px;
+                box-sizing: border-box;
+            }
+            h2,p{
+                margin:5px;
+                padding:0;
+            }
+            p{
+                font-size: 12px;
+                color: #222;
+            }
+            #rateMovie{
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.4);
+                position: fixed;
+                top: 0;
+                left: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .container{
+                width: 40%;
+                padding: 20px;
+                box-sizing: border-box;
+                background-color: var(--light-color);
+
+            }
+            .bordershadow{
+                border: solid 2px var(--dark-color);
+                box-shadow: var(--accent-color) -6px 10px;
+            }
+            .fa{
+                font-size: 20px;
+            }
+            .fa:hover{
+                opacity: 50%;
+            }
+            .fa:active{
+                -webkit-text-stroke: 1px var(--accent-color);
+                opacity: 70%;
+            }
+            .checked {
+                color: orange;
+            }
+            @keyframes message {
+                0%{
+                    top: -40px;
+                }
+                30%{
+                    top: 10px;
+                }
+                70%{
+                    top: 10px;
+                }
+                100%{
+                    top: -40px;
+                }
+            }
+            #rateMessage{
+                visibility: hidden;
+                position: fixed;
+                padding: 5px;
+                border: solid 2px var(--accent-color);
+                border-radius: 5px;
+                background-color: var(--light-color);
+                z-index: 1;
+                top: -40px;
+                left: 50vw;
+                transform: translateX(-50%);
+            }
+            .animation{
+                animation: message 2s cubic-bezier(.68,-0.55,.27,1.55);
+            }
+        </style>
+    </head>
+    <body onload="getMovies()" id="body">
+        <div id="rateMessage"><span>The movie was rated successfully!</span></div>
+        <div id="movieContainer">
+
+        </div>
+    </body>
+</html>
