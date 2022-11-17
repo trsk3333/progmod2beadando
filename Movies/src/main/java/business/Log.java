@@ -25,7 +25,7 @@ public class Log<T> {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbf.newDocumentBuilder();
-            File file = new File("log.xml");
+            File file = new File("C:\\Workspace\\progmod2\\MovieRating\\Movies\\movies\\log.xml");
             Document xml = builder.parse(file);
             xml.normalize();
             Element root = xml.getDocumentElement();

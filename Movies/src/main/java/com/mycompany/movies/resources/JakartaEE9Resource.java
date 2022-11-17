@@ -18,10 +18,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 
-/**
- *
- * @author 
- */
 @Path("jakartaee9")
 public class JakartaEE9Resource {
     

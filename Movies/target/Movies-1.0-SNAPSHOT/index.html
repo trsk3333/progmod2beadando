@@ -16,7 +16,7 @@
                 $("#movieContainer").html("");
 
                 $.get("http://127.0.0.1:8080/Movies-1.0-SNAPSHOT/resources/jakartaee9/getMovies", function (data) {
-                    if (data == null) {
+                    if (data === null) {
                         alert("An error occured!");
                         return;
                     }
