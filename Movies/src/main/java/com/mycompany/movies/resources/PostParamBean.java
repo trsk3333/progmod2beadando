@@ -9,7 +9,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Tulajdonos
+ * @author Tamás
  */
 @XmlRootElement
 public class PostParamBean {

@@ -12,6 +12,7 @@ import static Service.FileHandlingService.ImportMoviesFromLocalFile;
 import static Service.FileHandlingService.exportMoviesToLocalFile;
 import business.Log;
 import business.Movie;
+import business.WrongRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
@@ -30,6 +31,10 @@ public class JakartaEE9Resource {
                 .ok("ok")
                 .build();
     }
+    /**
+     * A tárolt filmek lekérdezését kiszolgáló függvény.
+     * @return HTTP Response mely a filmeket json formátumban továbbítja a kliens felé
+     */
     @GET
     @Path("getMovies")
     @Produces(MediaType.APPLICATION_JSON)
@@ -57,30 +62,54 @@ public class JakartaEE9Resource {
             return Response.serverError().build();
         }
     }
+    /**
+     * Egy adott film pontszámaiból kiszámolt átlag lekérdezését kiszolgáló függvény.
+     * @param index a film sorszáma
+     * @return a film pontszámainak átlaga
+     */
     @GET
     @Path("updateScore")
     public Response updateScores(@QueryParam("index") int index){
         try{
             List<Movie> movieList = ImportMoviesFromLocalFile(pathToMoviesFile);
+            if(index > movieList.size()){
+                throw new WrongRequestException("The movie was not found!");
+            }
             return Response.ok(averageOfScores(movieList.get(index).getScores())).build();
-        }catch(Exception e){
+        }catch(WrongRequestException wre){
+            return Response.ok(wre.getMessage()).build();
+        }
+        catch(Exception e){
             Log el = new Log();
             el.handleException(e);
             System.err.println(e.toString());
             return Response.serverError().build();
         }
     }
+    /**
+     * Egy adott film értékelését kiszolgáló függvény.
+     * @param input az értékelni kívánt film sorszámát és értékelését tartalmazó objektum
+     */
     @POST
     @Path("rateMovie")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response rateMovie(final PostParamBean input){
         try{
+            if(!(input.score>=1 && input.score<=5)){
+                throw new WrongRequestException("The score should be between 1 and 5!");
+            }
             List<Movie> movieList = ImportMoviesFromLocalFile(pathToMoviesFile);
+            if(input.index > movieList.size()){
+                throw new WrongRequestException("The movie was not found!");
+            }
             RatingService.rateMovie(movieList.get(input.index), input.score);
             exportMoviesToLocalFile(pathToMoviesFile, movieList);
 
             return Response.ok("The movie was rated successfully!").build();
-        }catch(Exception e){
+        }catch(WrongRequestException wre){
+            return Response.ok(wre.getMessage()).build();
+        }
+        catch(Exception e){
             Log el = new Log();
             el.handleException(e);
             System.err.println(e.toString());

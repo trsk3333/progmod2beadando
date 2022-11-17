@@ -20,10 +20,14 @@ import org.json.JSONObject;
 
 /**
  *
- * @author Tulajdonos
+ * @author Tamás
  */
 public class FileHandlingService {
-    
+    /**
+     * A megadott file-t beolvassa, valamint feldolgozza az adatokat.
+     * @param path a file elérési helye
+     * @return {@link Movie} objektumokat tartalmazó lista
+     */
     public static List<Movie> ImportMoviesFromLocalFile(String path){
         try{
             List<Movie> movieList = new ArrayList<>();
@@ -65,6 +69,11 @@ public class FileHandlingService {
         }
         return null;
     }
+    /**
+     * A megadott file-ba kiírja az adatokat.
+     * @param path a file elérési helye
+     * @param movieList a kiirandó lista
+     */
     public static void exportMoviesToLocalFile(String path, List<Movie> movieList){
         JSONObject jObj = new JSONObject();
         JSONArray jArray = new JSONArray();

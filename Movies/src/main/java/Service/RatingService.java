@@ -9,12 +9,22 @@ import java.util.List;
 
 /**
  *
- * @author Tulajdonos
+ * @author Tamás
  */
-public class RatingService {
+public class RatingService{
+    /**
+     * Hozzáadja a {@link score} -t a megadott {@link Movie} példányhoz
+     * @param movie az értékelni kívánt film
+     * @param score az értékelés
+     */
     public static void rateMovie(Movie movie, int score){
         movie.getScores().add(score);
     }
+    /**
+     * Kiszámolja az pontszámok átlagát egészre kerekítve.
+     * @param scores a pontszámokat tartalmazó {@link List}
+     * @return pontszámok átlaga
+     */
     public static int averageOfScores(List<Integer> scores){
         int sum = 0;
         for(int score : scores){

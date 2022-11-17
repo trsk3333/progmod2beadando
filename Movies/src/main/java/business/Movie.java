@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  *
- * @author Tulajdonos
+ * @author Tamás
  */
 public class Movie {
     private String title;
